@@ -7,5 +7,5 @@
 Using Visual Studio Code and Couchbase Java SDK 3 to create new database records in Couchbase and look them up. 
 
 
-include::../assets/common/java-vscode-intro.adoc[]
-include::../assets/common/quickstart-java3.adoc[]
+include::./common/java-vscode-intro.adoc[]
+include::./common/quickstart-java3.adoc[]

@@ -7,7 +7,7 @@
 Using Intellij and Couchbase Java SDK 2.7 to create new database records in Couchbase and look them up. 
 
 
-include::../assets/common/java-intellij-intro.adoc[]
+include::./common/java-intellij-intro.adoc[]
 
-include::../assets/common/quickstart-java27.adoc[]
+include::./common/quickstart-java27.adoc[]
 

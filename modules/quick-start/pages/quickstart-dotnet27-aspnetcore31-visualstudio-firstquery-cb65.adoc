@@ -39,10 +39,7 @@ image::templateSelect.png[Template select in Visual Studio]
 
 Install the latest link:https://github.com/couchbaselabs/Couchbase.Extensions[Couchbase.Extensions.DependencyInjection] package from NuGet. This will install both the Couchbase .NET SDK and a Dependency Injection extension for ASP.NET Core.
 
-[Note]
-====
-This open-source project is part of Couchbase Labs, and is not commercially supported by Couchbase, Inc.
-====
+NOTE: This open-source project is part of Couchbase Labs, and is not commercially supported by Couchbase, Inc.
 
 You can do this via Visual Studio's Package Manager Console like so:
 
@@ -51,10 +48,7 @@ You can do this via Visual Studio's Package Manager Console like so:
 Install-Package Couchbase.Extensions.DependencyInjection -Version 2.0.2
 ----
 
-[Note]
-====
-Alternatively, you can use the NuGet UI by right-clicking "Dependencies" in Solution Explore and then "Manage NuGet Packages".
-====
+NOTE: Alternatively, you can use the NuGet UI by right-clicking "Dependencies" in Solution Explore and then "Manage NuGet Packages".
 
 == Step 2: ASP.NET Core Configuration
 
@@ -148,10 +142,7 @@ curl --location --request POST 'https://localhost:44316/' \
 }'
 ----
 
-[Note]
-====
-If you're using Postman, you can copy and paste the above cURL command into Postman. (File->Import->Paste Raw Text) Please make sure your port number matches what Visual Studio has set. 
-====
+NOTE: If you're using Postman, you can copy and paste the above cURL command into Postman. (File->Import->Paste Raw Text) Please make sure your port number matches what Visual Studio has set. 
 
 When the request is successful, the response will contain the generated ID:
 
@@ -226,10 +217,7 @@ Compile and run your ASP.NET Core program locally with CTRL+F5. Use cURL or Post
 curl --location --request GET 'https://localhost:44316/?email=major.tom@acme.com'
 ----
 
-[Note]
-====
-Since this is a GET, you can make this request from a web browser instead.
-====
+NOTE: Since this is a GET, you can make this request from a web browser instead.
 
 The body of a successful response should look something like this:
 

@@ -6,7 +6,7 @@
 Using Intellij and Spring Data Couchbase SDK to create new database records in Couchbase and look them up. 
 
 
-include::../assets/common/java-intellij-intro.adoc[]
+include::./common/java-intellij-intro.adoc[]
 
-include::../assets/common/quickstart-spring32.adoc[]
+include::./common/quickstart-spring32.adoc[]
 

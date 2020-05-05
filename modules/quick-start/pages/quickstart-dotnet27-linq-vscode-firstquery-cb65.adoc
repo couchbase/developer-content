@@ -94,10 +94,7 @@ First, in `Main`, create a Couchbase cluster object to connect to Couchbase Serv
 include::{sourcedir}/Program.cs[tag=clusterSetup]
 ----
 
-[Note]
-====
-For this simple console app, I'm hardcoding the credentials, but you should consider using a config file.
-====
+NOTE: For this simple console app, I'm hardcoding the credentials, but you should consider using a config file.
 
 Using the bucket object, create a Linq2Couchbase context object:
 
@@ -119,10 +116,7 @@ include::{sourcedir}/Program.cs[tag=user]
 
 Now create instances of this object, and give them some values. Use `bucket.Upsert` to put this data into the Couchbase bucket.
 
-[Note]
-====
-"Upsert" will either create a new document or update an existing document. "Insert" will create a document, but fail if it already exists. "Replace" will update a document, but fail if it doesn't exist.
-====
+NOTE: "Upsert" will either create a new document or update an existing document. "Insert" will create a document, but fail if it already exists. "Replace" will update a document, but fail if it doesn't exist.
 
 [source,C#,indent=0]
 ----

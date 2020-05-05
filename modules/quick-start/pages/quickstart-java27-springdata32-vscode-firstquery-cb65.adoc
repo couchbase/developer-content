@@ -6,7 +6,7 @@
 Using Visual Studio Code and Spring Data Couchbase SDK to create new database records in Couchbase and look them up. 
 
 
-include::../assets/common/java-vscode-intro.adoc[]
+include::./common/java-vscode-intro.adoc[]
 
-include::../assets/common/quickstart-spring32.adoc[]
+include::./common/quickstart-spring32.adoc[]
 
