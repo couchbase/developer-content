@@ -29,13 +29,13 @@ Using the Couchbase .NET SDK in an ASP.NET Core application to create new databa
 
 Open Visual Studio 2019 and create a new ASP.NET Core Web Application project.
 
-image::newProject.png[New Project dialog in Visual Studio 2019]
+image::quickstart-aspnetcore31-cb65/newProject.png[New Project dialog in Visual Studio 2019]
 
 Name the project, "QuickStart".  
 
 Select the API template.
 
-image::templateSelect.png[Template select in Visual Studio]
+image::quickstart-aspnetcore31-cb65/templateSelect.png[Template select in Visual Studio]
 
 Install the latest link:https://github.com/couchbaselabs/Couchbase.Extensions[Couchbase.Extensions.DependencyInjection] package from NuGet. This will install both the Couchbase .NET SDK and a Dependency Injection extension for ASP.NET Core.
 
@@ -54,7 +54,7 @@ NOTE: Alternatively, you can use the NuGet UI by right-clicking "Dependencies" i
 
 There are two steps to configure your new ASP.NET Core application.
 
-First, add a "Couchbase" section to the appsettings.json file. If you've followed along with the xref:quickstart-docker-image-manual.adoc[10-minute Couchbase Docker Container Configuration], then edit your appsettings.json file to add a Couchbase section as follows:
+First, add a "Couchbase" section to the appsettings.json file. If you've followed along with the xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration], then edit your appsettings.json file to add a Couchbase section as follows:
 
 [source,JavaScript]
 ----

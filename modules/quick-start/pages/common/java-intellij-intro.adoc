@@ -8,7 +8,7 @@
 
 ** If you still need to perform these tasks please use the following:
 
-*** xref:quickstart-docker-image-manual.adoc[10-minute Couchbase Docker Container Configuration]
+*** xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
 
 2. IntelliJ is installed. If you don't have it installed yet, link:https://www.jetbrains.com/help/idea/installation-guide.html[follow this tutorial].
 
@@ -22,20 +22,20 @@ image::intellij-create-new-project-1.png[New Project dialog in IntelliJ, 480,ali
 
 Select the Maven template in the next dialog:
 
-image::intellij-create-new-project-2.png[Template select in IntelliJ, 480,align=left]
+image::quickstart-java27-cb65/intellij-create-new-project-2.png[Template select in IntelliJ, 480,align=left]
 
 Inform a name for your project and click on *Finish*:
 
-image::intellij-create-new-project-3.png[Project name in IntelliJ, 480,align=left]
+image::quickstart-java27-cb65/intellij-create-new-project-3.png[Project name in IntelliJ, 480,align=left]
 
 In the end, your project should look similar to the following:
 
-image::intellij-create-new-project-4.png[Project name in IntelliJ, 720,align=left]
+image::quickstart-java27-cb65/intellij-create-new-project-4.png[Project name in IntelliJ, 720,align=left]
 
 
 Now, right-click on the *java* folder of your project and select *new -> package* and choose a name for your new package:
 
-image::intellij-create-package.png[Create Package, 360,align=left]
+image::quickstart-java27-cb65/intellij-create-package.png[Create Package, 360,align=left]
 
 You can create new classes by right-clicking on your package name and selecting *new -> Java Class*:
 

@@ -16,7 +16,7 @@ Using SQL syntax and the Couchbase Query Workbench, create new database records 
 
 If you still need to perform these tasks please use the following:
 
-* xref:quickstart-docker-image-manual.adoc[10-minute Couchbase Docker Container Configuration]
+* xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
 
 //* or run the following command(s) to run an automatically-configured CE docker image
 //<commands>
