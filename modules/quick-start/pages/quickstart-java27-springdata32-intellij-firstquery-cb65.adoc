@@ -1,0 +1,12 @@
+= Couchbase Server Quickstart - Java with Spring Data Couchbase and IntelliJ
+:imagesdir: ../assets/images/quickstart-java27-cb65
+:sourcedir: ../examples/quickstart-java27-cb65
+
+[abstract]
+Using Intellij and Spring Data Couchbase SDK to create new database records in Couchbase and look them up. 
+
+
+include::../assets/common/java-intellij-intro.adoc[]
+
+include::../assets/common/quickstart-spring32.adoc[]
+
