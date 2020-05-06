@@ -237,4 +237,4 @@ The body of a successful response should look something like this:
 
 If you've written SQL before, the N1QL queries in this example should look familiar. Instead of querying a table, `default` is the name of a bucket.
 
-Be sure to check out the other quick start exercises. link:https://github.com/couchbase/docs-server/tree/release/6.5/modules/getting-started/examples/quickstart-aspnetcore31-cb65[The complete source code is available on GitHub].
+Be sure to check out the other quick start exercises. link:https://github.com/couchbase/developer-content/tree/master/modules/quick-start/examples/quickstart-aspnetcore31-cb65[The complete source code is available on GitHub].
