@@ -15,7 +15,7 @@ Using the Couchbase .NET SDK in a .NET Core console application to create new da
 
 ** If you still need to perform these tasks please use the following:
 
-*** xref:quickstart-docker-image-manual.adoc[10-minute Couchbase Docker Container Configuration]
+*** xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
 //*** */ or run the following command(s) to run an automatically-configured CE docker image
 //<commands>
 
@@ -190,4 +190,4 @@ Here is the complete Startup.cs.
 include::{sourcedir}/Program.cs[]
 ----
 
-Be sure to check out the other quick start exercises. link:https://github.com/couchbase/developer-content/tree/master/modules/quick-start/examples/quickstart-netcore31-cb65/FirstQuery[The complete source code is available on GitHub].
+Be sure to check out the other quick start exercises. link:https://github.com/couchbase/developer-content/tree/master/modules/quick-start/examples/quickstart-netcore31-cb65[The complete source code is available on GitHub].
