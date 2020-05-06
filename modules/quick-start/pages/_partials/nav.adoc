@@ -8,5 +8,5 @@
 ** xref:quick-start:quickstart-java27-springdata32-vscode-firstquery-cb65.adoc[Java with Spring Data Couchbase and Visual Studio Code]
 ** xref:quick-start:quickstart-dotnet27-aspnetcore31-visualstudio-firstquery-cb65.adoc[ASP.NET Core First Query]
 ** xref:quick-start:quickstart-dotnet27-linq-vscode-firstquery-cb65.adoc[.NET Core with Linq2Couchbase First Query]
-** xref:quick-start:quickstart-nodejs-ottoman-vscode-firstquery-cb65.adoc[Upsert and Lookup via Ottoman 2.6 & NodeJS SDK 2.6]
+** xref:quick-start:quickstart-nodejs26-ottoman-vscode-firstquery-cb65.adoc[Upsert and Lookup via Ottoman 2.6 & NodeJS SDK 2.6]
 
