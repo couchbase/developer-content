@@ -1,0 +1,282 @@
+= Couchbase Server Quickstart - Upsert and Lookup via NodeJS SDK 2.6
+:imagesdir: ../assets/images
+:sourcedir: ../examples
+
+[abstract]
+Before we get started with the Node JS SDK, we need to ensure you have Couchbase up and running. We will create a data bucket and two indexes for basic queries. Using Couchbase's N1QL query syntax, we will create two indexes, a primary and adaptive index. After we upsert our records, these indexes will allow us to look up our documents using N1QL and the query service. 
+
+== Prerequisites: Three Steps required to Query our Bucket
+
+. Setup Couchbase Server 6.5 and ensure it is running.
+. Create an empty bucket named "default".
+. Add a primary and adaptive index for our default bucket.
+
+anchor:couchbase-install-process[]
+
+To complete these steps, use the xref:quickstart-docker-image-manual-cb65-for-ottoman.adoc[10-minute Couchbase Docker Container Configuration Guide]
+
+== Step 1: Create a Node Project and Directory with NPM
+
+In this exercise, we will be working with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[NodeJS SDK v3.0] or any incremented minor version. I'm using link:https://nodejs.org/en/download[Node JS] version 12.14 and NPM version 6.13, you can find these version numbers for Node and NPM by running the following command:
+
+```sh
+node --version
+npm --version
+```
+
+NOTE: You can access the Couchbase Server Web UI by browsing to: link:https://localhost:8091[localhost:8091]. 
+
+Let's start by creating a project directory named `first-query-nodesdk`, change directories into our project and initialize NPM:
+
+```sh
+mkdir first-query-nodesdk && cd $_ && npm init
+```
+
+NOTE: The double ampersands `&&` are just a way of chaining multiple shell commands. The `$_` command captures our last used argument (the directory we created) and we use it to change to our new directory.
+
+Now that we have a Node project and manifest (`package.json`) in place, we can add some dependencies:
+
+```sh
+npm install couchbase uuid
+```
+
+Next, we create a file named `upsert.js` and launch Visual Studio Code:
+
+```sh
+touch upsert.js && code .
+```
+
+These commands have set up a project directory, enabled NPM, installed `couchbase` (Couchbase Node JS SDK) and `uuid` as well as created a `upsert.js` file opened up our VS Code editor to the project root.
+
+NOTE: The npm package `uuid` will provide us with a simple way to generate unique ids for our documents.
+
+Let's start ading code to our `upsert.js` file.
+
+Starting with the code sample below, each new block of code we introduce will come after any existing code.
+
+== Step 2: Connecting to a Couchbase Bucket
+
+Create a connection to our Couchbase Server. This will be the username and password you setup during the link:#couchbase-install-process[Couchbase install process].
+
+```js
+const { v4: uuid } = require('uuid')
+const couchbase = require('couchbase')
+
+const cluster = new couchbase.Cluster(
+  'couchbase://localhost',
+  { username: 'Administrator', password: 'password' }
+)
+const bucket = cluster.bucket('default')
+const collection = bucket.defaultCollection()
+```
+
+== Create a Single Document and Upsert
+
+First we will create a single document with JSON:
+
+```js
+const user = {
+  _type: 'user',
+  _id: uuid(),
+  email: 'perry.mason@acme.com',
+  firstName: 'Perry',
+  lastName: 'Mason',
+  tagLine: 'Who can we get on the case?'
+}
+```
+
+We will use the `collection.upsert()` method to persist this document to our database.
+
+Because the NodeJS SDK reurns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
+
+If it resolves without an error, we will have access to a return value, otherwise we will have accees to an `error` inside of our catch block and we will print the error message to the console. 
+
+```js
+const upsertSingleDocument = async () => {
+  try {
+    const key = `${user._type}_${user._id}`
+    const result = await collection.upsert(key, user)
+    console.log(result);
+    console.log(`Upserting one single doc w/ key: ${key}\n`)
+  } catch (error) {
+    console.error(error)
+  }
+}
+```
+
+NOTE: By creating a variable to store the result of our upsert operation, we are able to record the current state of a document; each time the document is modified, this value changes.
+
+With our `upsertSingleDocument()` function created, we now just need to call it on the next line.
+
+```js
+upsertSingleDocument()
+```
+
+The code we have written defines a document by way of a JSON object and persists that single document to our bucket named `default` in Couchbase.
+
+Let's run our app for the first time using Node:
+
+```sh
+node upsert
+```
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that one document was added to the `default` bucket. 
+
+NOTE: You can edit the document in place by clicking the pencil icon or remove them individually with the trash icon. You can also edit the buckets and in the section "Advanced bucket settings" click "Enable" under Flush. When flushed, all items in the bucket are removed. This is a quick way to remove all documents at once.
+
+Let's remove this single document, write some more code that will add multiple documents at once.
+
+== Create Multiple Documents and Upsert
+
+Next, we will create an array of documents using an array: 
+
+```js
+const users = [
+  {
+    _type: 'user',
+    _id: uuidv4(),
+    email: 'major.tom@acme.com',
+    firstName: 'Major',
+    lastName: 'Tom',
+    tagLine: 'Send me up a drink'
+  },{
+    _type: 'user',
+    _id: uuidv4(),
+    email: 'jerry.wasaracecardriver@acme.com',
+    firstName: 'Jerry',
+    lastName: 'Wasaracecardriver',
+    tagLine: 'el sob number one'
+  }
+]
+```
+
+We will use JavaScript's `Proise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurance of an error by using a try/catch block. SO long as each promis is resolved, we will save the results to a variable named `results` and Print them to the console.
+
+Let's add the function for upserting multiple documents:
+
+```JS
+async function multipleDocumentUpsert() {
+  try {
+    let results = await Promise.all(
+      users.map((user) => collection.upsert(`${user._type}_${user._id}`, user))
+    )
+    results.forEach((result) => console.log(result))
+    console.log(`All documents upserted!`)
+  } catch (error) {
+    console.error('First failure:', error)
+  }
+}
+```
+
+With our `multipleDocumentUpsert()` function created, we want to remove the call to `upsertSingleDocument` above and we are going to chain it together with the `multipleDocumentUpsert()` function call and add an exit command once all work is done. Add the following code on the next line.
+
+```js
+upsertSingleDocument()
+.then(() => {
+  upsertMultipleDocuments()
+  .then(() => process.exit(22))
+})
+```
+
+Before we run the `upsert.js` file, let's add one more command at the end of the file to shut node down after the documents are finished being upserted:
+
+Now if we run the application, we will get three documents added to the database. 
+
+```js
+node upsert
+```
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `multipleDocumentUpsert()` function.
+
+Let's remove these three documents one last time, next we will write a query ti fetch documents of by a users last name using parameters.
+
+== Query for User by Last Name
+
+We can query for our documents using teh N1QL query language. Our query service uses [N1QL](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html), which will be fairly familiar to anyone wth general SQL expereince.
+
+Knowing that our documents have a `_type` of "user" we can construct a query simply by knowing basic SQL, let's try it!
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can see that one document was added to the `default` bucket. we can qork on our query in the "Query Editor".
+
+We will `SELECT` all documents `FROM` our `default` bucket, `WHERE _type` is equal to `user`. We will then use the `AND` clause to specify `lastName` is equal to 'Tom'. Let's try it out!
+
+Copy and paste the query below into your Query Editor and hit the "Execute" button:
+
+```sql
+SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'
+```
+
+Considering that we have all three of our documents persisted to the database, this should give us three results:
+
+```JSON
+[
+  {
+    "default": {
+      "_id": "421f0989-67e5-4461-8661-5bcdb07711e2",
+      "_type": "user",
+      "email": "major.tom@acme.com",
+      "firstName": "Major",
+      "lastName": "Tom",
+      "tagLine": "Send me up a drink"
+    }
+  }
+]
+```
+
+Our results are correct in that only one of our documents is of `_type` 'user' and having a `lastName` of 'Tom'. 
+
+Now that we have tested our query, let'ssee what that query looks like when utilizing the Couchbase Node JS SDK:
+
+```JS
+const getUserByLastName = async() => {
+  var query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
+  let result = await cluster.query(query, (err, res) => {
+    if (err) throw err;
+    console.log("Result:", res);
+  })
+}
+```
+
+We are going to place this into a new file called `query.js`. Let's create that file and paste in the following code:
+
+```js
+const couchbase = require('couchbase')
+
+const cluster = new couchbase.Cluster(
+  'couchbase://localhost',
+  { username: 'Administrator', password: 'password' }
+)
+const bucket = cluster.bucket('default')
+
+const getUserByLastName = async() => {
+  var query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
+  let result = await cluster.query(query, (err, res) => {
+    if (err) throw err;
+    console.log("Result:", res.rows[0]);
+  })
+}
+```
+
+Now that we have our `getUserByLastName()` function in place, and our three document are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the users lst name is 'Tom'.
+
+Run the following command:
+
+```sh
+node query
+```
+
+The output should be as following:
+
+```sh
+Final Query Result: [object Promise]
+Result: {
+  default: {
+    _type: 'user',
+    _id: '36c619aa-d3f6-45d9-83ae-5ca26ecee012',
+    email: 'major.tom@acme.com',
+    firstName: 'Major',
+    lastName: 'Tom',
+    tagLine: 'Send me up a drink'
+  }
+}
+```
