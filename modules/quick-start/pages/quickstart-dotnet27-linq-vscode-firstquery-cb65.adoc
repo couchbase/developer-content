@@ -190,4 +190,4 @@ Here is the complete Startup.cs.
 include::{sourcedir}/Program.cs[]
 ----
 
-Be sure to check out the other quick start exercises. link:https://github.com/couchbase/docs-server/tree/release/6.5/modules/getting-started/examples/quickstart-netcore31-cb65[The complete source code is available on GitHub].
+Be sure to check out the other quick start exercises. link:https://github.com/couchbase/developer-content/tree/master/modules/quick-start/examples/quickstart-netcore31-cb65/FirstQuery[The complete source code is available on GitHub].
