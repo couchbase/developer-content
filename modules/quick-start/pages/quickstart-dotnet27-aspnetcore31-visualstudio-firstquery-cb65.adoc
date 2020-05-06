@@ -15,7 +15,7 @@ Using the Couchbase .NET SDK in an ASP.NET Core application to create new databa
 
 ** If you still need to perform these tasks please use the following:
 
-*** xref:quickstart-docker-image-manual.adoc[10-minute Couchbase Docker Container Configuration]
+*** xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
 //*** */ or run the following command(s) to run an automatically-configured CE docker image
 //<commands>
 
@@ -237,4 +237,4 @@ The body of a successful response should look something like this:
 
 If you've written SQL before, the N1QL queries in this example should look familiar. Instead of querying a table, `default` is the name of a bucket.
 
-Be sure to check out the other quick start exercises. link:https://github.com/couchbase/docs-server/tree/release/6.5/modules/getting-started/examples/quickstart-aspnetcore31-cb65[The complete source code is available on GitHub].
+Be sure to check out the other quick start exercises. link:https://github.com/couchbase/developer-content/tree/master/modules/quick-start/examples/quickstart-aspnetcore31-cb65[The complete source code is available on GitHub].
