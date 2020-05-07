@@ -251,18 +251,20 @@ Now that we have tested our query, let's use it in our code with `cluster.query(
 
 ```JS
 const getUserByLastName = async() => {
-  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
+  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'"
+  let returnValue
   await cluster.query(query, (err, res) => {
     if (err) throw err;
-    console.log("Result:", res.rows);
+    returnValue = res.rows
   })
+  return returnValue
 }
+
+getUserByLastName()
+.then((value) => console.log(value))
 ```
 
-We are going to place this into a new file called `query.js`. Let's create that file and paste in the following code:
-
-
-Now that we have our `getUserByLastName()` function in place, and our three document are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the users last name is 'Tom'.
+Now that we have our `getUserByLastName()` function in place, and our three documents are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the user's last name is 'Tom'.
 
 ```sh
 node query
@@ -283,3 +285,107 @@ Result: {
   }
 }
 ```
+
+I purposely wrote our `getUserBylastname()` function in a way that we could easily debug and understand, but it's a little verbose. Let's take another stab at writing this in a way that is more concise:
+
+```js
+const getUserByLastName = async() => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'"
+  return (await cluster.query(query)).rows
+}
+```
+
+Much better!
+
+== Step 6: Query for User by Last Name with Named Parameters
+
+I want to copy that same method and update it so that we have a function that will take a `lastName` as an argument. There are a few ways to do this, but I want to show off how to pass parameters to the `cluster.query()` method. I won't go into full detail, rather just update the function for you to see!
+
+```js
+const getUserByLastName = async(lastName) => {
+  const query = "SELECT * FROM `default` WHERE _type = $TYPE AND lastName = $LASTNAME"
+  const options = { parameters : {  TYPE: "user", LASTNAME: lastName} }
+  return (await cluster.query(query, options)).rows
+}
+
+getUserByLastName('Tom')
+.then((value) => console.log(value))
+```
+
+Pretty simple! We pass in our name as text, and parameterize the query using `$WHATEVER`.
+
+== Step 7: Query for User by Last Name with Positional Parameters
+
+I wanted to create one more function using positional parameters instead of named parameters:
+
+```js
+const getUserByLastName = async(lastName) => {
+  const query = "SELECT * FROM `default` WHERE _type = $1 AND lastName = $2"
+  const options = { parameters : ['user', lastName ] }
+  return (await cluster.query(query, options)).rows
+}
+
+getUserByLastName('Tom')
+.then((value) => console.log(value))
+```
+
+== Step 7: Get All Users and Return Multiple Documents
+
+There is no doubt in my mind if you made it this far that you understand the basics of using N1QL with the query service and the NodeJS SDK. In a real world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason. Let's test out a query that returns multiple documents. We can leave off the `AND lastName = 'Tom'` and create a new function called `getAllUsers()`. 
+
+Let's give that a try and make it very simple without options and parameters:
+
+```js
+const getAllusers = async() => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user'"
+  return (await cluster.query(query)).rows
+}
+
+getAllusers()
+.then((value) => console.log(value))
+```
+
+The call to `getAllUsers()` should give you an array with multiple documents returned:
+
+```sh
+[
+  {
+    default: {
+      _type: 'user',
+      _id: '00e597ae-3ad8-418d-b718-50fb033fab41',
+      email: 'jerry.wasaracecardriver@acme.com',
+      firstName: 'Jerry',
+      lastName: 'Wasaracecardriver',
+      tagLine: 'el sob number one'
+    }
+  },
+  {
+    default: {
+      _type: 'user',
+      _id: 'ae18629c-ba59-4bf1-9a15-8ad3aa1bbebc',
+      email: 'major.tom@acme.com',
+      firstName: 'Major',
+      lastName: 'Tom',
+      tagLine: 'Send me up a drink'
+    }
+  },
+  {
+    default: {
+      _type: 'user',
+      _id: 'e3f6f20e-7405-4451-926a-8be0d708bc0b',
+      email: 'perry.mason@acme.com',
+      firstName: 'Perry',
+      lastName: 'Mason',
+      tagLine: 'Who can we get on the case?'
+    }
+  }
+]
+```
+
+There you have it. We have walked through creating JSON objects, persisting them as documents to couchbase using upserts. We have learned how to query using N1QL in multiple ways and how to wrap those calls up in functions for use in your application. We have only scratched the surface, but we have built our foundational knowledge with strong examples!
+
+If you would like to continue learning about N1QL and the NodeJS SDK, I suggest checking our link:https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[NodeJS Documentation].
+
+== Exercise Complete
+
+Congratulations! You have engaged with the world's most powerful JSON document database by using Node and the NodeJS SDK from Couchbase. You can learn more about N1QL with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
