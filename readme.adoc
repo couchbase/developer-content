@@ -5,7 +5,7 @@ toc::[]
 
 This project is used to develop content for developers at different levels of experience with Couchbase. The content in this project is written in AsciiDoc and is intended to be built with Antora.
 
-== Development Quickstart [TBD]
+== Developer Bootstrap Exercises [TBD]
 
 This section offers a basic tutorial to learn how to set up the project and preview it locally. 
 
