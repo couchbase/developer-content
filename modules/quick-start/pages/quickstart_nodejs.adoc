@@ -70,7 +70,7 @@ const bucket = cluster.bucket('default')
 const collection = bucket.defaultCollection()
 ```
 
-== Create a Single Document and Upsert
+== Step 3: Create a Single Document and Upsert
 
 First we will create a single document with JSON:
 
@@ -87,9 +87,9 @@ const user = {
 
 We will use the `collection.upsert()` method to persist this document to our database.
 
-Because the NodeJS SDK reurns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
+Because the NodeJS SDK returns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
 
-If it resolves without an error, we will have access to a return value, otherwise we will have accees to an `error` inside of our catch block and we will print the error message to the console. 
+If it resolves without an error, we will have access to a return value, otherwise we will have access to an `error` inside of our catch block and we will print the error message to the console. 
 
 ```js
 const upsertSingleDocument = async () => {
@@ -104,7 +104,7 @@ const upsertSingleDocument = async () => {
 }
 ```
 
-NOTE: By creating a variable to store the result of our upsert operation, we are able to record the current state of a document; each time the document is modified, this value changes.
+NOTE: By creating a variable to store the result of our upsert operation, we have a record the current state of a couchbase document; each time the document is modified, this value changes and we will want to get the new values.
 
 With our `upsertSingleDocument()` function created, we now just need to call it on the next line.
 
@@ -112,7 +112,7 @@ With our `upsertSingleDocument()` function created, we now just need to call it 
 upsertSingleDocument()
 ```
 
-The code we have written defines a document by way of a JSON object and persists that single document to our bucket named `default` in Couchbase.
+The code we wrote defines a document as a JSON object and then persists that single document to our bucket named `default` in Couchbase.
 
 Let's run our app for the first time using Node:
 
@@ -122,11 +122,11 @@ node upsert
 
 If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that one document was added to the `default` bucket. 
 
-NOTE: You can edit the document in place by clicking the pencil icon or remove them individually with the trash icon. You can also edit the buckets and in the section "Advanced bucket settings" click "Enable" under Flush. When flushed, all items in the bucket are removed. This is a quick way to remove all documents at once.
+NOTE: You can edit each document by clicking the pencil icon or remove them with the trash icon. You can also edit the bucket and in "Advanced bucket settings" click "Enable" under *Flush*. When flushed, all items in the bucket are removed. This is a quick way to remove all documents at once, however; be careful as it wipes out your entire bucket.
 
-Let's remove this single document, write some more code that will add multiple documents at once.
+Let's remove this single document, and write some code that will add multiple documents at once.
 
-== Create Multiple Documents and Upsert
+== Step 4: Create Multiple Documents and Upsert
 
 Next, we will create an array of documents using an array: 
 
@@ -134,14 +134,14 @@ Next, we will create an array of documents using an array:
 const users = [
   {
     _type: 'user',
-    _id: uuidv4(),
+    _id: uuid(),
     email: 'major.tom@acme.com',
     firstName: 'Major',
     lastName: 'Tom',
     tagLine: 'Send me up a drink'
-  },{
+  }, {
     _type: 'user',
-    _id: uuidv4(),
+    _id: uuid(),
     email: 'jerry.wasaracecardriver@acme.com',
     firstName: 'Jerry',
     lastName: 'Wasaracecardriver',
@@ -150,25 +150,37 @@ const users = [
 ]
 ```
 
-We will use JavaScript's `Proise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurance of an error by using a try/catch block. SO long as each promis is resolved, we will save the results to a variable named `results` and Print them to the console.
+We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
 
 Let's add the function for upserting multiple documents:
 
 ```JS
-async function multipleDocumentUpsert() {
+const upsertMultipleDocuments = async () => {
   try {
-    let results = await Promise.all(
-      users.map((user) => collection.upsert(`${user._type}_${user._id}`, user))
+    var values = await Promise.all(
+      users.map((user) => {
+        let key = `${user._type}_${user._id}`
+        console.log(`Upserting one of multiple docs w/ key: ${key}\n`)
+        return collection.upsert(key, user)
+      })
     )
-    results.forEach((result) => console.log(result))
-    console.log(`All documents upserted!`)
+    values.forEach((value) => console.log(value))
   } catch (error) {
     console.error('First failure:', error)
   }
 }
 ```
 
-With our `multipleDocumentUpsert()` function created, we want to remove the call to `upsertSingleDocument` above and we are going to chain it together with the `multipleDocumentUpsert()` function call and add an exit command once all work is done. Add the following code on the next line.
+With our `upsertMultipleDocuments()` function created, we want to remove the call to `upsertSingleDocument()` that we had added above and we are going to chain it together with the `upsertMultipleDocuments()` function call and add an exit command once all work is done. Add the following code on the next line.
+
+```js
+upsertSingleDocument()
+.then(() => {
+  upsertMultipleDocuments()
+})
+```
+
+Before we run the `upsert.js` file, let's add one more command at the end of the file to shut node down after the documents are finished being upserted, update the code as follows:
 
 ```js
 upsertSingleDocument()
@@ -178,35 +190,45 @@ upsertSingleDocument()
 })
 ```
 
-Before we run the `upsert.js` file, let's add one more command at the end of the file to shut node down after the documents are finished being upserted:
-
-Now if we run the application, we will get three documents added to the database. 
+Now if we run the application, we will get three documents persisted to our bucket. 
 
 ```js
 node upsert
 ```
 
-If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `multipleDocumentUpsert()` function.
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `upsertMultipleDocuments()` function.
 
-Let's remove these three documents one last time, next we will write a query ti fetch documents of by a users last name using parameters.
+Next, we will write a query to fetch a document by a user's last name.
 
-== Query for User by Last Name
+== Step 5: Query for User by Last Name
 
-We can query for our documents using teh N1QL query language. Our query service uses [N1QL](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html), which will be fairly familiar to anyone wth general SQL expereince.
+We can query for our documents using the N1QL query language. Our query service uses [N1QL](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html), which will be fairly familiar to anyone with general SQL experience.
 
-Knowing that our documents have a `_type` of "user" we can construct a query simply by knowing basic SQL, let's try it!
+Knowing that our documents have a `_type` of *"user"* we can construct a query simply by knowing basic SQL, let's try it!
 
-If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can see that one document was added to the `default` bucket. we can qork on our query in the "Query Editor".
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
 
-We will `SELECT` all documents `FROM` our `default` bucket, `WHERE _type` is equal to `user`. We will then use the `AND` clause to specify `lastName` is equal to 'Tom'. Let's try it out!
+=== The Query Plan
 
-Copy and paste the query below into your Query Editor and hit the "Execute" button:
+Create a new file named `query.js` and paste the following code that connects to our bucket:
+
+```js
+const couchbase = require('couchbase')
+
+const cluster = new couchbase.Cluster(
+  'couchbase://localhost',
+  { username: 'Administrator', password: 'password' }
+)
+const bucket = cluster.bucket('default')
+```
+
+We want to select all documents from our `default` bucket, where `_type` is equal to 'user' and where `lastName` is equal to 'Tom'. I have written a simple query using N1QL, but the fact that it is so simple, it looks just like SQL. Not all N1QL is exactly like SQL, but it's very similar, so similar in some cases you can't really tell the difference. Just like in the query below.
 
 ```sql
 SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'
 ```
 
-Considering that we have all three of our documents persisted to the database, this should give us three results:
+Copy and paste this query into your "Query Editor" and hit the "Execute" button, we should get the following result:
 
 ```JSON
 [
@@ -223,49 +245,30 @@ Considering that we have all three of our documents persisted to the database, t
 ]
 ```
 
-Our results are correct in that only one of our documents is of `_type` 'user' and having a `lastName` of 'Tom'. 
+Our results are correct in that only one of our documents is of `_type` 'user' and `lastName` equal to 'Tom'. 
 
-Now that we have tested our query, let'ssee what that query looks like when utilizing the Couchbase Node JS SDK:
+Now that we have tested our query, let's use it in our code with `cluster.query()`. In our case, we will pass in one argument (the query) and a callback:
 
 ```JS
 const getUserByLastName = async() => {
-  var query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
-  let result = await cluster.query(query, (err, res) => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
+  await cluster.query(query, (err, res) => {
     if (err) throw err;
-    console.log("Result:", res);
+    console.log("Result:", res.rows);
   })
 }
 ```
 
 We are going to place this into a new file called `query.js`. Let's create that file and paste in the following code:
 
-```js
-const couchbase = require('couchbase')
 
-const cluster = new couchbase.Cluster(
-  'couchbase://localhost',
-  { username: 'Administrator', password: 'password' }
-)
-const bucket = cluster.bucket('default')
-
-const getUserByLastName = async() => {
-  var query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'";
-  let result = await cluster.query(query, (err, res) => {
-    if (err) throw err;
-    console.log("Result:", res.rows[0]);
-  })
-}
-```
-
-Now that we have our `getUserByLastName()` function in place, and our three document are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the users lst name is 'Tom'.
-
-Run the following command:
+Now that we have our `getUserByLastName()` function in place, and our three document are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the users last name is 'Tom'.
 
 ```sh
 node query
 ```
 
-The output should be as following:
+The output should similar to:
 
 ```sh
 Final Query Result: [object Promise]
