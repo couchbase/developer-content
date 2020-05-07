@@ -1,11 +1,10 @@
 ** xref:quick-start:quickstart-docker-image-manual-cb65.adoc[Couchbase Server Example Configuration]
 ** xref:quick-start:quickstart-nosdk-webUI-firstquery-cb65.adoc[SQL JSON Upsert and Lookup via Web UI]
 ** xref:quick-start:quickstart-java3-native-intellij-firstquery-cb65.adoc[Java with Couchbase SDK 3 and IntelliJ]
-** xref:quick-start:quickstart-java3-native-vscode-firstquery-cb65.adoc[Java with Couchbase SDK 3 and Visual Studio Code]
 ** xref:quick-start:quickstart-java27-native-intellij-firstquery-cb65.adoc[Java with Couchbase SDK 2.7 and IntelliJ]
-** xref:quick-start:quickstart-java27-native-vscode-firstquery-cb65.adoc[Java with Couchbase SDK 2.7 and Visual Studio Code]
+
 ** xref:quick-start:quickstart-java27-springdata32-intellij-firstquery-cb65.adoc[Java with Spring Data Couchbase and IntelliJ]
-** xref:quick-start:quickstart-java27-springdata32-vscode-firstquery-cb65.adoc[Java with Spring Data Couchbase and Visual Studio Code]
+//** xref:quick-start:quickstart-java27-springdata32-vscode-firstquery-cb65.adoc[Java with Spring Data Couchbase and Visual Studio Code]
 ** xref:quick-start:quickstart-dotnet27-aspnetcore31-visualstudio-firstquery-cb65.adoc[ASP.NET Core First Query]
 ** xref:quick-start:quickstart-dotnet27-linq-vscode-firstquery-cb65.adoc[.NET Core with Linq2Couchbase First Query]
 ** xref:quick-start:quickstart-nodejs26-ottoman-vscode-firstquery-cb65.adoc[Upsert and Lookup via Ottoman 2.6 & NodeJS SDK 2.6]
