@@ -1,0 +1,14 @@
+== Prerequisite: Run Couchbase Server
+
+1. Couchbase Server 6.5 is already running.
+
+2. An empty bucket named "default" has been created.
+
+3. Both a primary index and an adaptive index have been created and built on the default bucket.
+
+If you still need to perform these tasks please use the following:
+
+* xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
+
+//* or run the following command(s) to run an automatically-configured CE docker image
+//<commands>

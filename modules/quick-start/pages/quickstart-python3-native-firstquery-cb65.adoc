@@ -1,0 +1,208 @@
+= Couchbase Server Quickstart with Couchbase Python SDK
+:tabs:
+:imagesdir: ../assets/images
+
+[abstract]
+Using the Couchbase Python SDK, create new database records in Couchbase and look them up.
+
+This exercise assumes that you are familiar with relational and document databases, and provides a fast-track from zero to secondary lookup using Couchbase Server and Python SDK. 
+
+
+include::partial$pre-requisite-run-couchbase-server.adoc[]
+
+The Couchbase Python SDK 3.0 requires Python 3, with Python 3.5 and above supported
+
+== Step 1: Install Couchbase Python SDK
+
+[{tabs}]
+====
+Debian and Ubuntu::
++
+--
+# Only needed during first-time setup:
+sudo apt-get install git-all python3-dev python3-pip python3-setuptools cmake build-essential
+sudo pip3 install couchbase
+--
+
+RHEL and CentOS::
++
+--
+# Only needed during first-time setup:
+sudo yum install gcc gcc-c++ python-devel python-pip cmake
+sudo pip3 install couchbase
+--
+
+macOS::
++
+--
+brew update # get list of latest packages
+brew install python
+pip3 install couchbase
+--
+====
+
+For more details on installing Couchbase Python SDK 3.0, see the https://docs.couchbase.com/python-sdk/3.0/hello-world/start-using-sdk.html[Couchbase Python SDK documentation].
+
+== Step 2: Connecting to Couchbase using Python SDK
+
+Let's first show how to connect with Couchbase so you can access the 'default' bucket using the Python SDK.
+
+[source,python]
+----
+# these modules are used to access and authenticate with your database cluster:
+from couchbase.cluster import Cluster
+from couchbase.cluster import PasswordAuthenticator
+
+# specify the database to access:
+cluster = Cluster('localhost')
+
+# to connect to a Couchbase bucket, you must use Couchbase Role-Based Access Control (RBAC).
+# an authenticator containing a username and password must be defined and passed to the
+# cluster.
+authenticator = PasswordAuthenticator('Administrator', 'password')
+
+# pass the authentication credentials to the cluster
+cluster.authenticate(authenticator)
+----
+
+== Step 3: Create and Query a New Document
+
+Suppose we need to store the following data in the database representing 3 distinct users:
+
+[source,python]
+----
+user0001 = {
+    "firstName" : "Perry",
+    "lastName" : "Mason",
+    "email" : "perry.mason@acme.com",
+    "tagLine" : "Who can we get on the case?",
+    "type" : "user"
+}
+
+user0002 = {
+    "firstName" : "Major",
+    "lastName" : "Tom",
+    "email" : "major.tom@acme.com(opens in new tab)",
+    "tagLine" : "Send me up a drink",
+    "type" : "user"
+}
+user0003 = {
+    "firstName" : "Jerry",
+    "lastName" : "Wasaracecardriver",
+    "email" : "jerry.wasaracecardriver@acme.com(opens in new tab)",
+    "tagLine" : "el sob number one",
+    "type" : "user"
+}
+----
+
+Documents are created using the `bucket.insert()` and `bucket.insert_multi()` methods. They can also be created using the `bucket.upsert()` and `bucket.upsert_multi()` methods.
+
+The code to store a single user in the `default` bucket would look like the following:
+
+[source,python]
+----
+#insert a single document
+rv = bucket.upsert('newDoc1', user0001)
+print (rv)
+----
+
+* The `user0001` is defined as a series of JSON key-value pairs.
+* The `newDoc1` is the name of the document you want to create.
+
+The code to store multiple users in the `default` bucket would look like the following:
+
+[source,python]
+----
+rv = bucket.upsert_multi({'newDoc2':user0002, 'newDoc3':user0003})
+print (rv)
+----
+
+IMPORTANT: Since *SDK 3.0* all Key-Value operations are executed on the *collection* level instead of the *bucket* level.
+
+To recover the document by the id, you can use the `bucket.get()` method.
+
+[source,python]
+----
+# first lookup using the key
+rv = bucket.get('newDoc2')
+print(rv.value)
+----
+
+Finally, here is how you query the database when you need all users where the *email* ends with *@acme.com*: 
+
+[source,python]
+----
+#first secondary lookup to find all users with email ending in @acme.com
+
+query_result = cluster.query('SELECT * FROM `default` WHERE email LIKE $email', QueryOptions(named_parameters={'email': "%@acme.com"}))
+for row in query_result:
+   print(row) 
+----
+
+Here is all of the code for our class:
+
+[source,python]
+----
+# these modules are used to access and authenticate with your database cluster:
+from couchbase.cluster import Cluster, ClusterOptions, QueryOptions
+from couchbase_core.cluster import PasswordAuthenticator
+
+# specify the cluster and specify an authenticator containing a username and password to be passed to the cluster.
+
+cluster = Cluster('couchbase://localhost', ClusterOptions(PasswordAuthenticator('Administrator', 'password')))
+
+# following a successful authentication, a bucket can be opened.
+# access a bucket in that cluster
+
+bucket = cluster.bucket('default')
+coll = bucket.default_collection()
+
+# following a successful authentication, a bucket can be accessed to perform operations
+
+# JSON Object for user0001
+user0001 = {
+    "firstName" : "Perry",
+    "lastName" : "Mason",
+    "email" : "perry.mason@acme.com",
+    "tagLine" : "Who can we get on the case?",
+    "type" : "user"
+}
+
+#insert a single document
+rv = bucket.upsert('newDoc1', user0001)
+print (rv)
+
+#insert multiple documents
+
+user0002 = {
+    "firstName" : "Major",
+    "lastName" : "Tom",
+    "email" : "major.tom@acme.com(opens in new tab)",
+    "tagLine" : "Send me up a drink",
+    "type" : "user"
+}
+user0003 = {
+    "firstName" : "Jerry",
+    "lastName" : "Wasaracecardriver",
+    "email" : "jerry.wasaracecardriver@acme.com(opens in new tab)",
+    "tagLine" : "el sob number one",
+    "type" : "user"
+}
+
+rv = bucket.upsert_multi({'newDoc2':user0002, 'newDoc3':user0003})
+print (rv)
+
+# first lookup using the key
+rv = bucket.get('newDoc2')
+print(rv.value)
+
+#first secondary lookup to find all users with email ending in @acme.com
+
+query_result = cluster.query('SELECT * FROM `default` WHERE email LIKE $email', QueryOptions(named_parameters={'email': "%@acme.com"}))
+for row in query_result:
+   print(row) 
+----
+
+TIP: Make sure you have at least a primary index in your bucket before running the code.
+
+If you want to run the code to see its output, copy the complete code into a file, say `connect.py`, and run `python3 connect.py`.
