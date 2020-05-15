@@ -56,19 +56,18 @@ Let's first show how to connect with Couchbase so you can access the 'default' b
 [source,python]
 ----
 # these modules are used to access and authenticate with your database cluster:
-from couchbase.cluster import Cluster
-from couchbase.cluster import PasswordAuthenticator
+from couchbase.cluster import Cluster, ClusterOptions, QueryOptions
+from couchbase_core.cluster import PasswordAuthenticator
 
-# specify the database to access:
-cluster = Cluster('localhost')
+# specify the cluster and specify an authenticator containing a username and password to be passed to the cluster.
 
-# to connect to a Couchbase bucket, you must use Couchbase Role-Based Access Control (RBAC).
-# an authenticator containing a username and password must be defined and passed to the
-# cluster.
-authenticator = PasswordAuthenticator('Administrator', 'password')
+cluster = Cluster('couchbase://localhost', ClusterOptions(PasswordAuthenticator('Administrator', 'password')))
 
-# pass the authentication credentials to the cluster
-cluster.authenticate(authenticator)
+# following a successful authentication, a bucket can be opened.
+# access a bucket in that cluster
+
+bucket = cluster.bucket('default')
+coll = bucket.default_collection()
 ----
 
 == Step 3: Create and Query a New Document
