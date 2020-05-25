@@ -363,7 +363,7 @@ The output should look like the following:
 image::Intellij-application-run-succesfully.png[Application Ran Successfully,720,align=left]
 
 
-TIP: If you forgot to create the required indexes, your application will fail to execute the *CmdRunner* class. Check out this xref:quickstart-docker-image-manual.adoc[tutorial] or run `+create primary index on default+`on link:https://docs.couchbase.com/server/current/tools/query-workbench.html[Couchbase's Query Workbench]. I'm assuming that *default* is the name of your bucket.
+TIP: If you forgot to create the required indexes, your application will fail to execute the *CmdRunner* class. Check out this xref:quickstart-docker-image-manual-cb65.adoc[tutorial] or run `+create primary index on default+`on link:https://docs.couchbase.com/server/current/tools/query-workbench.html[Couchbase's Query Workbench]. I'm assuming that *default* is the name of your bucket.
 
 
 In the code above, we first create a new instances of the *User* entity and store them in the database using the *save* method. This is how all three documents will look like on Couchbase:
