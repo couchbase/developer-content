@@ -1,14 +1,14 @@
-= Couchbase Server Quickstart - Upsert and Lookup via Node JS SDK 2.6
+= Couchbase Server Quickstart - Upsert and Lookup via Node.js SDK 2.6
 :imagesdir: ../assets/images
 :sourcedir: ../examples
 
 [abstract]
-Before we get started with the Node JS SDK, we need to ensure you have Couchbase up and running. We will create a data bucket and two query indexes. Using Couchbase's N1QL query syntax, we will create those two indexes (one primary and one adaptive). We will upsert some records, then use our indexes to look up our documents using N1QL and the query service that is exposed through our Couchbase Node JS SDK.
+Before we get started with the Node.js SDK, we need to ensure you have Couchbase up and running. We will create a data bucket and two query indexes. Using Couchbase's N1QL query syntax, we will create those two indexes (one primary and one adaptive). We will upsert some records, then use our indexes to look up our documents using N1QL and the query service that is exposed through our Couchbase Node.js SDK.
 
 == Software Requirements
 . Docker/Docker Desktop
 . Visual Studio
-. Node JS and NPM
+. Node.js and NPM
 
 With the above software, we will have everything we need to move on from here!
 
@@ -22,9 +22,9 @@ anchor:couchbase-install-process[]
 
 To complete these steps, use the * xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
 
-== Step 1: Create a Node Project and Directory with NPM
+== Step 1: Create a Node.js Project and Directory with NPM
 
-In this exercise, we will be working with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[Node JS SDK v3.0] or any incremented minor version. I'm using link:https://nodejs.org/en/download[Node JS] version 12.14 and NPM version 6.13. If you have Node installed, you can find these version numbers by running the commands:
+In this exercise, we will be working with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[Node.js SDK v3.0] or any incremented minor version. I'm using link:https://nodejs.org/en/download[Node.js] version 12.14 and NPM version 6.13. If you have Node installed, you can find these version numbers by running the commands:
 
 ```sh
 node --version
@@ -41,7 +41,7 @@ mkdir first-query-nodesdk && cd $_ && npm init
 
 NOTE: The double ampersands `&&` are just a way of chaining multiple shell commands. The `$_` command captures our last used argument (the directory we created) and we use it to change to our new directory.
 
-Now that we have a Node project and manifest (`package.json`) in place, we can add some dependencies:
+Now that we have a Node.js project and manifest (`package.json`) in place, we can add some dependencies:
 
 ```sh
 npm install couchbase uuid
@@ -53,7 +53,7 @@ Next, we create a file named `upsert.js` and launch Visual Studio Code:
 touch upsert.js && code .
 ```
 
-These commands have set up a project directory, enabled NPM, installed `couchbase` (Couchbase Node JS SDK) and `uuid` as well as created a `upsert.js` file opened up our VS Code editor to the project root.
+These commands have set up a project directory, enabled NPM, installed `couchbase` (Couchbase Node.js SDK) and `uuid` as well as created a `upsert.js` file opened up our VS Code editor to the project root.
 
 NOTE: The npm package `uuid` will provide us with a simple way to generate unique ids for our documents.
 
@@ -94,7 +94,7 @@ const user = {
 
 We will use the `collection.upsert()` method to persist this document to our database.
 
-Because the Node JS SDK returns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
+Because the Node.js SDK returns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
 
 If it resolves without an error, we will have access to a return value, otherwise we will have access to an `error` inside of our catch block and we will print the error message to the console. 
 
@@ -157,7 +157,7 @@ const users = [
 ]
 ```
 
-We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
+We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurrence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
 
 Let's add the function for upserting multiple documents:
 
@@ -187,7 +187,7 @@ upsertSingleDocument()
 })
 ```
 
-Before we run the `upsert.js` file, let's add one more command at the end of the file to shut node down after the documents are finished being upserted, update the code as follows:
+Before we run the `upsert.js` file, let's add one more command at the end of the file to shut Node down after the documents are finished being upserted, update the code as follows:
 
 ```js
 upsertSingleDocument()
@@ -197,7 +197,9 @@ upsertSingleDocument()
 })
 ```
 
-Now if we run the application, we will get three documents persisted to our bucket. 
+Now if we run the application, we will get three documents persisted to our bucket. As well, after the `upsertMultipleDocuments()` function has resolved, we will use a command to exit our Node.js application in the terminal. 
+
+Note: The process object is global and allows us to manage the current Node.js process without even the use of a require statement to import it.
 
 ```js
 node upsert
@@ -338,7 +340,7 @@ getUserByLastName('Tom')
 
 == Step 7: Get All Users and Return Multiple Documents
 
-There is no doubt in my mind if you made it this far that you understand the basics of using N1QL with the query service and the Node JS SDK. In a real world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason. Let's test out a query that returns multiple documents. We can leave off the `AND lastName = 'Tom'` and create a new function called `getAllUsers()`. 
+There is no doubt in my mind if you made it this far that you understand the basics of using N1QL with the query service and the Node.js SDK. In a real world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason. Let's test out a query that returns multiple documents. We can leave off the `AND lastName = 'Tom'` and create a new function called `getAllUsers()`. 
 
 Let's give that a try and make it very simple without options and parameters:
 
@@ -389,10 +391,10 @@ The call to `getAllUsers()` should give you an array with multiple documents ret
 ]
 ```
 
-There you have it. We have walked through creating JSON objects, persisting them as documents to couchbase using upserts. We have learned how to query using N1QL in multiple ways and how to wrap those calls up in functions for use in your application. We have only scratched the surface, but we have built our foundational knowledge with strong examples!
+There you have it. We have walked through creating JSON objects, persisting them as documents to Couchbase using upserts. We have learned how to query using N1QL in multiple ways and how to wrap those calls up in functions for use in your application. We have only scratched the surface, but we have built our foundational knowledge with strong examples!
 
-If you would like to continue learning about N1QL and the Node JS SDK, I suggest checking our link:https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[Node JS Documentation].
+If you would like to continue learning about N1QL and the Node.js SDK, I suggest checking our link:https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[Node.js Documentation].
 
 == Exercise Complete
 
-Congratulations! You have engaged with the world's most powerful JSON document database by using Node and the Node JS SDK from Couchbase. You can learn more about N1QL with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
+Congratulations! You have engaged with the world's most powerful JSON document database using the Node.js SDK from Couchbase. You can learn more about N1QL with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
