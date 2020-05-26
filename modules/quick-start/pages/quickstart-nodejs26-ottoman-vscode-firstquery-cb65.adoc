@@ -15,7 +15,7 @@ Before we get started with Ottoman and Node JS, we need to ensure you have Couch
 
 If you still need to perform these tasks please use one of the following:
 
-* xref:quickstart-docker-image-manual-cb65-for-ottoman.adoc[5-minute Couchbase Docker Container Configuration]
+* xref:quickstart-docker-image-manual-cb65.adoc[5-minute Couchbase Docker Container Configuration]
 
 == Step 1: Create The Ottoman Node JS Project
 
