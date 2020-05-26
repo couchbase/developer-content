@@ -1,0 +1,400 @@
+= Couchbase Server Quickstart - Upsert and Lookup via Node.js SDK 2.6
+:imagesdir: ../assets/images
+:sourcedir: ../examples
+
+[abstract]
+Before we get started with the Node.js SDK, we need to ensure you have Couchbase up and running. We will create a data bucket and two query indexes. Using Couchbase's N1QL query syntax, we will create those two indexes (one primary and one adaptive). We will upsert some records, then use our indexes to look up our documents using N1QL and the query service that is exposed through our Couchbase Node.js SDK.
+
+== Software Requirements
+. Docker/Docker Desktop
+. Visual Studio
+. Node.js and NPM
+
+With the above software, we will have everything we need to move on from here!
+
+== Prerequisites: Three Steps to Set Up Couchbase and Query Our Bucket
+
+. Set up Couchbase Server 6.5 and ensure it is running
+. Create an empty bucket named “default”
+. Add a primary and adaptive index for our default bucket
+
+anchor:couchbase-install-process[]
+
+To complete these steps, use the * xref:quickstart-docker-image-manual-cb65.adoc[10-minute Couchbase Docker Container Configuration]
+
+== Step 1: Create a Node.js Project and Directory with NPM
+
+In this exercise, we will be working with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[Node.js SDK v3.0] or any incremented minor version. I'm using link:https://nodejs.org/en/download[Node.js] version 12.14 and NPM version 6.13. If you have Node installed, you can find these version numbers by running the commands:
+
+```sh
+node --version
+npm --version
+```
+
+NOTE: You can access the Couchbase Server Web UI by browsing to: link:https://localhost:8091[localhost:8091]. 
+
+Let's start by creating a project directory named `first-query-nodesdk`, change directories into our project and initialize NPM:
+
+```sh
+mkdir first-query-nodesdk && cd $_ && npm init
+```
+
+NOTE: The double ampersands `&&` are just a way of chaining multiple shell commands. The `$_` command captures our last used argument (the directory we created) and we use it to change to our new directory.
+
+Now that we have a Node.js project and manifest (`package.json`) in place, we can add some dependencies:
+
+```sh
+npm install couchbase uuid
+```
+
+Next, we create a file named `upsert.js` and launch Visual Studio Code:
+
+```sh
+touch upsert.js && code .
+```
+
+These commands have set up a project directory, enabled NPM, installed `couchbase` (Couchbase Node.js SDK) and `uuid` as well as created a `upsert.js` file opened up our VS Code editor to the project root.
+
+NOTE: The npm package `uuid` will provide us with a simple way to generate unique ids for our documents.
+
+Let's start ading code to our `upsert.js` file.
+
+Starting with the code sample below, each new block of code we introduce will come after any existing code.
+
+== Step 2: Connecting to a Couchbase Bucket
+
+Create a connection to our Couchbase Server. This will be the username and password you setup during the link:#couchbase-install-process[Couchbase install process].
+
+```js
+const { v4: uuid } = require('uuid')
+const couchbase = require('couchbase')
+
+const cluster = new couchbase.Cluster(
+  'couchbase://localhost',
+  { username: 'Administrator', password: 'password' }
+)
+const bucket = cluster.bucket('default')
+const collection = bucket.defaultCollection()
+```
+
+== Step 3: Create a Single Document and Upsert
+
+First we will create a single document with JSON:
+
+```js
+const user = {
+  _type: 'user',
+  _id: uuid(),
+  email: 'perry.mason@acme.com',
+  firstName: 'Perry',
+  lastName: 'Mason',
+  tagLine: 'Who can we get on the case?'
+}
+```
+
+We will use the `collection.upsert()` method to persist this document to our database.
+
+Because the Node.js SDK returns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
+
+If it resolves without an error, we will have access to a return value, otherwise we will have access to an `error` inside of our catch block and we will print the error message to the console. 
+
+```js
+const upsertSingleDocument = async () => {
+  try {
+    const key = `${user._type}_${user._id}`
+    const result = await collection.upsert(key, user)
+    console.log(result);
+    console.log(`Upserting one single doc w/ key: ${key}\n`)
+  } catch (error) {
+    console.error(error)
+  }
+}
+```
+
+NOTE: By creating a variable to store the result of our upsert operation, we have a record the current state of a couchbase document; each time the document is modified, this value changes and we will want to get the new values.
+
+With our `upsertSingleDocument()` function created, we now just need to call it on the next line.
+
+```js
+upsertSingleDocument()
+```
+
+The code we wrote defines a document as a JSON object and then persists that single document to our bucket named `default` in Couchbase.
+
+Let's run our app for the first time using Node:
+
+```sh
+node upsert
+```
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that one document was added to the `default` bucket. 
+
+NOTE: You can edit each document by clicking the pencil icon or remove them with the trash icon. You can also edit the bucket and in "Advanced bucket settings" click "Enable" under *Flush*. When flushed, all items in the bucket are removed. This is a quick way to remove all documents at once, however; be careful as it wipes out your entire bucket.
+
+Let's remove this single document, and write some code that will add multiple documents at once.
+
+== Step 4: Create Multiple Documents and Upsert
+
+Next, we will create an array of documents using an array: 
+
+```js
+const users = [
+  {
+    _type: 'user',
+    _id: uuid(),
+    email: 'major.tom@acme.com',
+    firstName: 'Major',
+    lastName: 'Tom',
+    tagLine: 'Send me up a drink'
+  }, {
+    _type: 'user',
+    _id: uuid(),
+    email: 'jerry.wasaracecardriver@acme.com',
+    firstName: 'Jerry',
+    lastName: 'Wasaracecardriver',
+    tagLine: 'el sob number one'
+  }
+]
+```
+
+We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurrence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
+
+Let's add the function for upserting multiple documents:
+
+```JS
+const upsertMultipleDocuments = async () => {
+  try {
+    var values = await Promise.all(
+      users.map((user) => {
+        let key = `${user._type}_${user._id}`
+        console.log(`Upserting one of multiple docs w/ key: ${key}\n`)
+        return collection.upsert(key, user)
+      })
+    )
+    values.forEach((value) => console.log(value))
+  } catch (error) {
+    console.error('First failure:', error)
+  }
+}
+```
+
+With our `upsertMultipleDocuments()` function created, we want to remove the call to `upsertSingleDocument()` that we had added above and we are going to chain it together with the `upsertMultipleDocuments()` function call and add an exit command once all work is done. Add the following code on the next line.
+
+```js
+upsertSingleDocument()
+.then(() => {
+  upsertMultipleDocuments()
+})
+```
+
+Before we run the `upsert.js` file, let's add one more command at the end of the file to shut Node down after the documents are finished being upserted, update the code as follows:
+
+```js
+upsertSingleDocument()
+.then(() => {
+  upsertMultipleDocuments()
+  .then(() => process.exit(22))
+})
+```
+
+Now if we run the application, we will get three documents persisted to our bucket. As well, after the `upsertMultipleDocuments()` function has resolved, we will use a command to exit our Node.js application in the terminal. 
+
+Note: The process object is global and allows us to manage the current Node.js process without even the use of a require statement to import it.
+
+```js
+node upsert
+```
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `upsertMultipleDocuments()` function.
+
+Next, we will write a query to fetch a document by a user's last name.
+
+== Step 5: Query for User by Last Name
+
+We can query for our documents using the N1QL query language. Our query service uses [N1QL](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html), which will be fairly familiar to anyone with general SQL experience.
+
+Knowing that our documents have a `_type` of *"user"* we can construct a query simply by knowing basic SQL, let's try it!
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
+
+=== The Query Plan
+
+Create a new file named `query.js` and paste the following code that connects to our bucket:
+
+```js
+const couchbase = require('couchbase')
+
+const cluster = new couchbase.Cluster(
+  'couchbase://localhost',
+  { username: 'Administrator', password: 'password' }
+)
+const bucket = cluster.bucket('default')
+```
+
+We want to select all documents from our `default` bucket, where `_type` is equal to 'user' and where `lastName` is equal to 'Tom'. I have written a simple query using N1QL, but the fact that it is so simple, it looks just like SQL. Not all N1QL is exactly like SQL, but it's very similar, so similar in some cases you can't really tell the difference. Just like in the query below.
+
+```sql
+SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'
+```
+
+Copy and paste this query into your "Query Editor" and hit the "Execute" button, we should get the following result:
+
+```JSON
+[
+  {
+    "default": {
+      "_id": "421f0989-67e5-4461-8661-5bcdb07711e2",
+      "_type": "user",
+      "email": "major.tom@acme.com",
+      "firstName": "Major",
+      "lastName": "Tom",
+      "tagLine": "Send me up a drink"
+    }
+  }
+]
+```
+
+Our results are correct in that only one of our documents is of `_type` 'user' and `lastName` equal to 'Tom'. 
+
+Now that we have tested our query, let's use it in our code with `cluster.query()`. In our case, we will pass in one argument (the query) and a callback:
+
+```JS
+const getUserByLastName = async() => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'"
+  let returnValue
+  await cluster.query(query, (err, res) => {
+    if (err) throw err;
+    returnValue = res.rows
+  })
+  return returnValue
+}
+
+getUserByLastName()
+.then((value) => console.log(value))
+```
+
+Now that we have our `getUserByLastName()` function in place, and our three documents are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the user's last name is 'Tom'.
+
+```sh
+node query
+```
+
+The output should similar to:
+
+```sh
+Final Query Result: [object Promise]
+Result: {
+  default: {
+    _type: 'user',
+    _id: '36c619aa-d3f6-45d9-83ae-5ca26ecee012',
+    email: 'major.tom@acme.com',
+    firstName: 'Major',
+    lastName: 'Tom',
+    tagLine: 'Send me up a drink'
+  }
+}
+```
+
+I purposely wrote our `getUserBylastname()` function in a way that we could easily debug and understand, but it's a little verbose. Let's take another stab at writing this in a way that is more concise:
+
+```js
+const getUserByLastName = async() => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user' AND lastName = 'Tom'"
+  return (await cluster.query(query)).rows
+}
+```
+
+Much better!
+
+== Step 6: Query for User by Last Name with Named Parameters
+
+I want to copy that same method and update it so that we have a function that will take a `lastName` as an argument. There are a few ways to do this, but I want to show off how to pass parameters to the `cluster.query()` method. I won't go into full detail, rather just update the function for you to see!
+
+```js
+const getUserByLastName = async(lastName) => {
+  const query = "SELECT * FROM `default` WHERE _type = $TYPE AND lastName = $LASTNAME"
+  const options = { parameters : {  TYPE: "user", LASTNAME: lastName} }
+  return (await cluster.query(query, options)).rows
+}
+
+getUserByLastName('Tom')
+.then((value) => console.log(value))
+```
+
+Pretty simple! We pass in our name as text, and parameterize the query using `$WHATEVER`.
+
+== Step 7: Query for User by Last Name with Positional Parameters
+
+I wanted to create one more function using positional parameters instead of named parameters:
+
+```js
+const getUserByLastName = async(lastName) => {
+  const query = "SELECT * FROM `default` WHERE _type = $1 AND lastName = $2"
+  const options = { parameters : ['user', lastName ] }
+  return (await cluster.query(query, options)).rows
+}
+
+getUserByLastName('Tom')
+.then((value) => console.log(value))
+```
+
+== Step 7: Get All Users and Return Multiple Documents
+
+There is no doubt in my mind if you made it this far that you understand the basics of using N1QL with the query service and the Node.js SDK. In a real world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason. Let's test out a query that returns multiple documents. We can leave off the `AND lastName = 'Tom'` and create a new function called `getAllUsers()`. 
+
+Let's give that a try and make it very simple without options and parameters:
+
+```js
+const getAllusers = async() => {
+  const query = "SELECT * FROM `default` WHERE _type = 'user'"
+  return (await cluster.query(query)).rows
+}
+
+getAllusers()
+.then((value) => console.log(value))
+```
+
+The call to `getAllUsers()` should give you an array with multiple documents returned:
+
+```sh
+[
+  {
+    default: {
+      _type: 'user',
+      _id: '00e597ae-3ad8-418d-b718-50fb033fab41',
+      email: 'jerry.wasaracecardriver@acme.com',
+      firstName: 'Jerry',
+      lastName: 'Wasaracecardriver',
+      tagLine: 'el sob number one'
+    }
+  },
+  {
+    default: {
+      _type: 'user',
+      _id: 'ae18629c-ba59-4bf1-9a15-8ad3aa1bbebc',
+      email: 'major.tom@acme.com',
+      firstName: 'Major',
+      lastName: 'Tom',
+      tagLine: 'Send me up a drink'
+    }
+  },
+  {
+    default: {
+      _type: 'user',
+      _id: 'e3f6f20e-7405-4451-926a-8be0d708bc0b',
+      email: 'perry.mason@acme.com',
+      firstName: 'Perry',
+      lastName: 'Mason',
+      tagLine: 'Who can we get on the case?'
+    }
+  }
+]
+```
+
+There you have it. We have walked through creating JSON objects, persisting them as documents to Couchbase using upserts. We have learned how to query using N1QL in multiple ways and how to wrap those calls up in functions for use in your application. We have only scratched the surface, but we have built our foundational knowledge with strong examples!
+
+If you would like to continue learning about N1QL and the Node.js SDK, I suggest checking our link:https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[Node.js Documentation].
+
+== Exercise Complete
+
+Congratulations! You have engaged with the world's most powerful JSON document database using the Node.js SDK from Couchbase. You can learn more about N1QL with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
