@@ -2,7 +2,6 @@
 :imagesdir: ../assets/images
 :sourcedir: ../examples
 
-[abstract]
 Before we get started with the Node.js SDK, we need to ensure you have Couchbase up and running. We will create a data bucket and two query indexes. Using Couchbase's N1QL query syntax, we will create those two indexes (one primary and one adaptive). We will upsert some records, then use our indexes to look up our documents using N1QL and the query service that is exposed through our Couchbase Node.js SDK.
 
 == Software Requirements
@@ -57,13 +56,13 @@ These commands have set up a project directory, enabled NPM, installed `couchbas
 
 NOTE: The npm package `uuid` will provide us with a simple way to generate unique ids for our documents.
 
-Let's start ading code to our `upsert.js` file.
+Let's start adding code to our `upsert.js` file.
 
 Starting with the code sample below, each new block of code we introduce will come after any existing code.
 
 == Step 2: Connecting to a Couchbase Bucket
 
-Create a connection to our Couchbase Server. This will be the username and password you setup during the link:#couchbase-install-process[Couchbase install process].
+Create a connection to our Couchbase Server. This will be the username and password you set up during the link:#couchbase-install-process[Couchbase install process].
 
 ```js
 const { v4: uuid } = require('uuid')
@@ -79,7 +78,7 @@ const collection = bucket.defaultCollection()
 
 == Step 3: Create a Single Document and Upsert
 
-First we will create a single document with JSON:
+First, we will create a single document with JSON:
 
 ```js
 const user = {
@@ -92,11 +91,11 @@ const user = {
 }
 ```
 
-We will use the `collection.upsert()` method to persist this document to our database.
+Next, we use the `collection.upsert()` method to persist this document to our database.
 
 Because the Node.js SDK returns a promise from the upsert method, we can write a try block and inside call the upsert method and wait until that promise settles and returns its result using the `await` keyword.
 
-If it resolves without an error, we will have access to a return value, otherwise we will have access to an `error` inside of our catch block and we will print the error message to the console. 
+If it resolves without an error, we will have access to a return value, otherwise, we will have access to an `error` inside of our catch block and we will print the error message to the console. 
 
 ```js
 const upsertSingleDocument = async () => {
@@ -111,7 +110,7 @@ const upsertSingleDocument = async () => {
 }
 ```
 
-NOTE: By creating a variable to store the result of our upsert operation, we have a record the current state of a couchbase document; each time the document is modified, this value changes and we will want to get the new values.
+NOTE: By creating a variable to store the result of our upsert operation, we have a record of the current state of a couchbase document; each time the document is modified, this value changes and we will want to get the new values.
 
 With our `upsertSingleDocument()` function created, we now just need to call it on the next line.
 
@@ -157,7 +156,7 @@ const users = [
 ]
 ```
 
-We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any one upsert fails we will be able to catch the first occurrence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
+We will use JavaScript's `Promise.all()` and `Array.map()` to upsert multiple documents at once. If any of the upserts fail, we will be able to catch the first occurrence of an error by using a try/catch block. So long as each promise is resolved, we will save the results to a variable named `results` and Print them to the console.
 
 Let's add the function for upserting multiple documents:
 
@@ -199,7 +198,7 @@ upsertSingleDocument()
 
 Now if we run the application, we will get three documents persisted to our bucket. As well, after the `upsertMultipleDocuments()` function has resolved, we will use a command to exit our Node.js application in the terminal. 
 
-Note: The process object is global and allows us to manage the current Node.js process without even the use of a require statement to import it.
+Note: The process object is global and allows us to manage the current Node.js process without the use of a `require()` statement to import it.
 
 ```js
 node upsert
@@ -211,11 +210,11 @@ Next, we will write a query to fetch a document by a user's last name.
 
 == Step 5: Query for User by Last Name
 
-We can query for our documents using the N1QL query language. Our query service uses [N1QL](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html), which will be fairly familiar to anyone with general SQL experience.
+We can query for our documents using the N1QL query language. Our query service uses link:https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html[N1QL], which will be fairly familiar to anyone with general SQL experience.
 
 Knowing that our documents have a `_type` of *"user"* we can construct a query simply by knowing basic SQL, let's try it!
 
-If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
+If we open our Web UI  (link:https://localhost:8091[localhost:8091]) and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
 
 === The Query Plan
 
@@ -273,13 +272,13 @@ getUserByLastName()
 .then((value) => console.log(value))
 ```
 
-Now that we have our `getUserByLastName()` function in place, and our three documents are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the user's last name is 'Tom'.
+Now that we have our `getUserByLastName()` function in place and our three documents are in the bucket. Let's run `query.js` which will print out the result of our query finding the one document where the user's last name is 'Tom'.
 
 ```sh
 node query
 ```
 
-The output should similar to:
+The output should be similar to:
 
 ```sh
 Final Query Result: [object Promise]
@@ -338,11 +337,9 @@ getUserByLastName('Tom')
 .then((value) => console.log(value))
 ```
 
-== Step 7: Get All Users and Return Multiple Documents
+== Step 8: Get All Users and Return Multiple Documents
 
-There is no doubt in my mind if you made it this far that you understand the basics of using N1QL with the query service and the Node.js SDK. In a real world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason. Let's test out a query that returns multiple documents. We can leave off the `AND lastName = 'Tom'` and create a new function called `getAllUsers()`. 
-
-Let's give that a try and make it very simple without options and parameters:
+In a real-world application, you would typically not use N1QL queries when you expect only one result to be returned, for that reason, let's build a query that returns multiple documents. Our new function will be `getAllUsers()`. Let's also make it simple and leave off the options and parameters:
 
 ```js
 const getAllusers = async() => {
