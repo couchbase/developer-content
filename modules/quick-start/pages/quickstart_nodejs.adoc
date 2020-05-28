@@ -23,14 +23,14 @@ To complete these steps, use the * xref:quickstart-docker-image-manual-cb65.adoc
 
 == Step 1: Create a Node.js Project and Directory with NPM
 
-In this exercise, we will be working with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[Node.js SDK v3.0] or any incremented minor version. I'm using link:https://nodejs.org/en/download[Node.js] version 12.14 and NPM version 6.13. If you have Node installed, you can find these version numbers by running the commands:
+In this exercise, we will be working with the https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[Node.js SDK v3.0] or any incremented minor version. I'm using https://nodejs.org/en/download[Node.js] version 12.14 and NPM version 6.13. If you have Node installed, you can find these version numbers by running the commands:
 
 ```sh
 node --version
 npm --version
 ```
 
-NOTE: You can access the Couchbase Server Web UI by browsing to: link:https://localhost:8091[localhost:8091]. 
+NOTE: You can access the Couchbase Server Web UI by browsing to: https://localhost:8091[localhost:8091]. 
 
 Let's start by creating a project directory named `first-query-nodesdk`, change directories into our project and initialize NPM:
 
@@ -62,7 +62,7 @@ Starting with the code sample below, each new block of code we introduce will co
 
 == Step 2: Connecting to a Couchbase Bucket
 
-Create a connection to our Couchbase Server. This will be the username and password you set up during the link:#couchbase-install-process[Couchbase install process].
+Create a connection to our Couchbase Server. This will be the username and password you set up during the #couchbase-install-process[Couchbase install process].
 
 ```js
 const { v4: uuid } = require('uuid')
@@ -126,7 +126,7 @@ Let's run our app for the first time using Node:
 node upsert
 ```
 
-If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that one document was added to the `default` bucket. 
+If we open our Web UI at https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that one document was added to the `default` bucket. 
 
 NOTE: You can edit each document by clicking the pencil icon or remove them with the trash icon. You can also edit the bucket and in "Advanced bucket settings" click "Enable" under *Flush*. When flushed, all items in the bucket are removed. This is a quick way to remove all documents at once, however; be careful as it wipes out your entire bucket.
 
@@ -204,17 +204,17 @@ Note: The process object is global and allows us to manage the current Node.js p
 node upsert
 ```
 
-If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `upsertMultipleDocuments()` function.
+If we open our Web UI at https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that three documents were added to the `default` bucket. One from our `upsertSingleDocument()` function and two from our `upsertMultipleDocuments()` function.
 
 Next, we will write a query to fetch a document by a user's last name.
 
 == Step 5: Query for User by Last Name
 
-We can query for our documents using the N1QL query language. Our query service uses link:https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html[N1QL], which will be fairly familiar to anyone with general SQL experience.
+We can query for our documents using the N1QL query language. Our query service uses https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html[N1QL], which will be fairly familiar to anyone with general SQL experience.
 
 Knowing that our documents have a `_type` of *"user"* we can construct a query simply by knowing basic SQL, let's try it!
 
-If we open our Web UI  (link:https://localhost:8091[localhost:8091]) and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
+If we open our Web UI: https://localhost:8091[localhost:8091] and navigate to the "Query" tab, we can work on our query inside the "Query Editor".
 
 === The Query Plan
 
@@ -390,8 +390,8 @@ The call to `getAllUsers()` should give you an array with multiple documents ret
 
 There you have it. We have walked through creating JSON objects, persisting them as documents to Couchbase using upserts. We have learned how to query using N1QL in multiple ways and how to wrap those calls up in functions for use in your application. We have only scratched the surface, but we have built our foundational knowledge with strong examples!
 
-If you would like to continue learning about N1QL and the Node.js SDK, I suggest checking our link:https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[Node.js Documentation].
+If you would like to continue learning about N1QL and the Node.js SDK, I suggest checking our https://docs.couchbase.com/nodejs-sdk/3.0/howtos/n1ql-queries-with-sdk.html[Node.js Documentation].
 
 == Exercise Complete
 
-Congratulations! You have engaged with the world's most powerful JSON document database using the Node.js SDK from Couchbase. You can learn more about N1QL with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
+Congratulations! You have engaged with the world's most powerful JSON document database using the Node.js SDK from Couchbase. You can learn more about N1QL with our https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring more of the query language for Couchbase.
