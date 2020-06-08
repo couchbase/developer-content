@@ -1,5 +1,5 @@
 = Couchbase Server Quickstart - Java with Spring Data Couchbase and Visual Studio Code
-:imagesdir: ../assets/images/quickstart-java27-cb65
+:imagesdir: ../assets/images/quickstart-java27-cb65/
 :sourcedir: ../examples/quickstart-java27-cb65
 
 [abstract]
