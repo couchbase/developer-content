@@ -31,6 +31,7 @@ Next, we will add Couchbase Spring Data as a dependency of your project with the
 [source,XML]
 ----
 
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -41,9 +42,22 @@ Next, we will add Couchbase Spring Data as a dependency of your project with the
     
 ----
 
-The block above should also be under the *project* tag.
+The block above should also be inside the *project* tag.
 
-Here is the full version of how your *pom.xml* should look like:
+IMPORTANT: If the `<dependencies>` tag is already present in your *pom.xml* file, you should add just the dependency instead:
+
+[source,XML]
+----
+    <!-- add the block bellow inside the <dependencies> tag -->
+    <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-couchbase</artifactId>
+        <version>3.2.3.RELEASE</version>
+    </dependency>
+----
+
+
+Your *pom.xml* file should look like the following:
 
 [source,XML]
 ----

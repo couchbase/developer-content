@@ -1,7 +1,7 @@
 == Step 2: Adding Couchbase Dependency
 
 
-The first step is to add following block above the tag called *</project>* near the end of your *pom.xml* file:
+To add Couchbase as a dependency, simply add following block above the tag *</project>* near the end of your *pom.xml* file:
 
 [source,XML]
 ----
@@ -15,10 +15,23 @@ The first step is to add following block above the tag called *</project>* near 
 
 ----
 
+IMPORTANT: If the `<dependencies>` tag is already present in your *pom.xml* file, you should add just the dependency instead:
+
+[source,XML]
+----
+    <!-- add the block bellow inside the <dependencies> tag -->
+      <dependency>
+        <groupId>com.couchbase.client</groupId>
+        <artifactId>java-client</artifactId>
+        <version>2.7.14</version>
+      </dependency>
+----
+
+
 
 == Step 3: Connecting to Couchbase
 
-We will build a simple line command app. Let's first show how to connect with Couchbase:
+We will build a simple line command app. Let's start by creating a new class called `QuickStartCouchbase` to show how to connect with Couchbase:
 
 
 [source,Java]

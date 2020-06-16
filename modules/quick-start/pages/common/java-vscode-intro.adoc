@@ -20,26 +20,28 @@
 
 Open *VsCode* and click on *Create a Maven Project...*
 
-image::quickstart-java27-cb65/vscode-start-new-project.png[New Project dialog in IntelliJ, 720,align=left]
+image::vscode-start-new-project.png[New Project dialog in IntelliJ, 720,align=left]
+
+IMPORTANT: If the *Java Overview* tab does not appear automatically, press the shortcut keys Ctrl + Shift + P (on Windows) or CMD + Shift +P (on Mac) to open VSCode command input panel and then type "Java Overview".
 
 Select the *maven-archetype-quickstart* in the dialog that opens:
 
-image::quickstart-java27-cb65/vscode-maven-1.png[Template select in IntelliJ, 480,align=left]
+image::vscode-maven-1.png[Template select in IntelliJ, 480,align=left]
 
 Then pick the option *1.4* in the next dialog:
 
-image::quickstart-java27-cb65/vscode-maven-2.png[MVN Version, 480,align=left]
+image::vscode-maven-2.png[MVN Version, 480,align=left]
 
 Finally, select the destination folder of your project. After that, *VsCode* will ask you the *groupId*, *artifactId*, *version* and *package*. You can fill it as you wish:
 
-image::quickstart-java27-cb65/vscode-maven-3.png[Maven Questions, 720,align=left]
+image::vscode-maven-3.png[Maven Questions, 720,align=left]
 
 Open the project you just created with *File -> Open* and select the folder with the name of your *artifactId*. It should look similar to the following image:
 
-image::quickstart-java27-cb65/vscode-final-project.png[New Project, 720,align=left]
+image::vscode-final-project.png[New Project, 720,align=left]
 
 You can create new classes by right-clicking on your package name and selecting the option *New File*, and then, inform the name of your class with the *.java* extension:
 
-image::quickstart-java27-cb65/vscode-new-class.png[New Class, 480,align=left]
+image::vscode-new-class.png[New Class, 480,align=left]
 
 
