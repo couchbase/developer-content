@@ -87,14 +87,14 @@ user0001 = {
 user0002 = {
     "firstName" : "Major",
     "lastName" : "Tom",
-    "email" : "major.tom@acme.com(opens in new tab)",
+    "email" : "major.tom@acme.com",
     "tagLine" : "Send me up a drink",
     "type" : "user"
 }
 user0003 = {
     "firstName" : "Jerry",
     "lastName" : "Wasaracecardriver",
-    "email" : "jerry.wasaracecardriver@acme.com(opens in new tab)",
+    "email" : "jerry.wasaracecardriver@acme.com",
     "tagLine" : "el sob number one",
     "type" : "user"
 }
@@ -182,14 +182,14 @@ print (rv)
 user0002 = {
     "firstName" : "Major",
     "lastName" : "Tom",
-    "email" : "major.tom@acme.com(opens in new tab)",
+    "email" : "major.tom@acme.com",
     "tagLine" : "Send me up a drink",
     "type" : "user"
 }
 user0003 = {
     "firstName" : "Jerry",
     "lastName" : "Wasaracecardriver",
-    "email" : "jerry.wasaracecardriver@acme.com(opens in new tab)",
+    "email" : "jerry.wasaracecardriver@acme.com",
     "tagLine" : "el sob number one",
     "type" : "user"
 }
