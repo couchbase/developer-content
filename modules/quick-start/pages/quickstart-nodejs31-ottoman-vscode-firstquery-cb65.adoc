@@ -1,0 +1,251 @@
+= Couchbase Server Quickstart - Upsert and Lookup via Ottoman V2 & NodeJS SDK 3.1
+:imagesdir: ../assets/images
+:sourcedir: ../examples
+
+[abstract]
+Before we get started with Ottoman and Node JS, we need to ensure you have Couchbase up and running. We will create a data bucket and two indexes for basic queries. Using Couchbase's N1QL query syntax, we will create two indexes, a primary and adaptive index. After we upsert our records, these indexes will allow us to look up our documents with the Query API in Ottoman. 
+
+== Prerequisites: Three Steps required to Query our Bucket
+
+1. Setup Couchbase Server 6.5 and ensure it is running.
+
+2. Create an empty bucket named "default".
+
+3. Add a primary and adaptive index for our default bucket.
+
+If you still need to perform these tasks please use one of the following:
+
+* xref:quickstart-docker-image-manual-cb65.adoc[5-minute Couchbase Docker Container Configuration]
+
+== Step 1: Create The Ottoman Node JS Project
+
+In this exercise, we will be working with the link:https://github.com/couchbaselabs/node-ottoman[Ottoman 2.6 ODM (Object Document Mapper)] in conjunction with the link:https://docs.couchbase.com/nodejs-sdk/2.6/start-using-sdk.html[NodeJS SDK v2.6.11] or any minor version that is higher will do. I'm using Node JS version 12.14 and NPM version 6.13, you can find these version numbers for Node and NPM by running the following command:
+
+```sh
+node --version
+npm --version
+```
+
+NOTE: you can get to the Couchbase Server Web UI at any time by visiting link:https://localhost:8091[localhost:8091]. 
+
+Let's first create a project directory named `first-query-ottoman`, change directories into that directory and initialize NPM:
+
+```sh
+mkdir first-query-ottoman && cd $_ && npm init
+```
+
+NOTE: The double ampersands (`&&`)are just a way of chaining multiple shell commands. The `$_` command simply captures our last used argument which in our case was the directory that we created.
+
+Now with a node package manager and manifest (`package.json`) in place, let's add Couchbase and ottoman to our dependencies for the project:
+
+```sh
+npm install ottoman
+```
+
+Now we will create a file named `save.js` and launch Visual Studio Code:
+
+```sh
+touch user-schema-model.js save.js find.js && code .
+```
+
+This command has set up a project directory and enabled npm, installed `ottoman` as well as created the files we will use (`user-schema-model.js`, `save.js`, `find.js`). 
+
+== Create Schema and Model for Export
+
+Open `user-schema-model.js` file, this is where we'll start by adding a schema and model that we can export and use in our other files.
+
+```js
+const { model, Schema } = require('ottoman')
+
+const userSchema = new Schema({ 
+  firstName: String,
+  lastName: String,
+  email: String,
+  tagline: String
+})
+const User = model('User', userSchema)
+
+exports.User = User;
+```
+
+== Connecting to a Couchbase Bucket
+
+Open `save.js` file. We will be adding each block of code one after the other...
+
+We will first connect to our Couchbase Server:
+
+```js
+const { Ottoman, model, Schema } = require('ottoman')
+const ottoman = new Ottoman({collectionName: '_default'})
+
+ottoman.connect({
+  connectionString: 'couchbase://localhost',
+  bucketName: 'default',
+  username: 'Administrator',
+  password: 'password'
+})
+```
+
+Next we will import our schema/model:
+
+```js
+const { User } = require('./user-schema-model')
+```
+
+== Create New User Documents
+
+Here we are defining a few documents that we want to persist to our bucket, notice we are using the same document that we defined in our model.
+
+```js
+const perry = new User({
+  firstName: 'Perry',
+  lastName: 'Mason',
+  email: 'perry.mason@acme.com',
+  tagLine: 'Who can we get on the case?'
+})
+const tom = new User({
+  firstName: 'Major',
+  lastName: 'Tom',
+  email: 'major.tom@acme.com',
+  tagLine: 'Send me up a drink'
+})
+```
+
+== Create an Async Function to Persist our Documents
+
+Call Ottoman's `save()` method on each of these objects which will add them to our database so long as no errors occur.
+
+```js
+const saveDocuments = async () => {
+  let perryResult, tomResult
+  try {
+    perryResult = await perry.save()
+    tomResult = await tom.save()
+  } catch (err) {
+    throw err
+  }
+  return { perryResult: perryResult, tomResult: tomResult }
+}
+```
+
+We just need to call `ottoman.start` which will create any indexes we need and call our async method and log some info for success vs error:
+
+```js
+ottoman.start()
+  .then(() => {
+    saveDocuments()
+      .then((res) => {
+        console.log('success: users added!')
+        console.log('document save results: ', res)
+      })
+      .catch((err) => console.log('error: ', err))
+  })
+```
+
+Now that we have added the code to save (persist) each record to the database, let's run our app for the first time with Node:
+
+```sh
+node save
+```
+
+You should get three success messages in the console.
+
+```sh
+success: users added!
+document save results:  {
+  perryResult: _Model {
+    firstName: 'Perry',
+    lastName: 'Mason',
+    email: 'perry.mason@acme.com',
+    id: '363da3c3-0814-4aa0-bb45-1b456b6058a2',
+    _type: 'User'
+  },
+  tomResult: _Model {
+    firstName: 'Major',
+    lastName: 'Tom',
+    email: 'major.tom@acme.com',
+    id: '0e18bbc3-0a88-4c91-88d1-e831933f0eb5',
+    _type: 'User'
+  }
+}
+```
+
+If we open our Web UI at link:https://localhost:8091[localhost:8091] and navigate to the "Buckets" tab, we can see that two records were added to the `default` bucket. 
+
+NOTE: You can edit the document in place by clicking the pencil icon or remove them individually with the trash icon. You can also edit the buckets and in the section "Advanced bucket settings" enable Flush. When flushed, all items in the bucket are removed. This is a quick way to remove all documents.
+
+Let's remove these three documents, write some more code that will add the documents, and then turn around and query them.
+
+== Find Documents with Ottoman's
+
+In Ottoman, we can retrieve records from our bucket using the `find()` method. Open the `find.js` document and add the following code:
+
+```js
+const { Ottoman, SearchConsistency } = require('ottoman')
+const ottoman = new Ottoman({collectionName: '_default'})
+
+ottoman.connect({
+  connectionString: 'couchbase://localhost',
+  bucketName: 'default',
+  username: 'Administrator',
+  password: 'password'
+})
+
+const { User } = require('./user-schema-model')
+```
+
+The first two arguments to the `find()` method are `filter` and `options`. 
+
+Instead of passing objects along as parameters, let's write our code to define the filter and options as objects first and then pass them into the function as arguments.
+
+```js
+const findDocuments = async () => {
+  try {
+    const filter = { lastName: 'Tom' }
+    const options = { consistency: SearchConsistency.LOCAL }
+    const result = await User.find(filter, options)
+    return result.rows
+  } catch (err) {
+    throw err
+  }
+}
+```
+
+NOTE: If we had a lot more data and we were expecting hundreds of records to be returned, we could page the results with our options to get the second page (pagination), like this:
+
+```js
+var options = {
+  limit: 10,
+  skip: 10
+  consistency: ottoman.Consistency.LOCAL
+}
+```
+
+Let's run Node again and now we should get the same three success messages and an object returned to us that we queried for:
+
+```sh
+node find
+```
+
+You should see results similar to the following in your command line:
+
+```sh
+result:  [
+  _Model {
+    email: 'major.tom@acme.com',
+    firstName: 'Major',
+    id: '7274c988-d0d2-4387-8a4b-918cdcdf8265',
+    lastName: 'Tom'
+  }
+]
+```
+
+== Summary
+
+We have created models in Ottoman, defined some documents, and persisted them to the database. We then subsequently looked them up using the built-in `find()` method which used the Ottoman Query API for Couchbase. We have not yet touched on indexes other than the fact that we created two of them during the docker and indexes section of the quickstart.
+
+If you would like to continue learning about Ottoman, I suggest checking out the link:http://ottomanjs.com/[Ottoman Documentation].
+
+== Exercise Complete
+
+Congratulations! You have engaged with the world's most powerful JSON document database by using Ottoman. Know that our query language N1QL was run under the hood too but we did not have to write any N1QL, you can learn more about it with our link:https://query-tutorial.couchbase.com/tutorial[N1QL Tutorial] if you are interested in exploring our query language for Couchbase.
