@@ -171,7 +171,7 @@ Finally, here is how you query the database when you need all users where the *e
 [source,Java]
 ----
     QueryResult result = cluster.query(
-            "SELECT * FROM `" + bucketName + "` WHERE email = $email",
+            "SELECT * FROM `" + bucketName + "` WHERE email LIKE $email",
             QueryOptions.queryOptions().parameters(JsonObject.create().put("email", "%@acme.com"))
     );
 
