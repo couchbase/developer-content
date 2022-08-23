@@ -3,7 +3,7 @@
 
 Now let's update your project with all the dependencies we need. I will assume that your application is a web project, and to make things easier, we will also use link:https://spring.io/projects/spring-boot[Spring Boot] in this tutorial.
 
-The first step is to add following block under the tag called *project* of your *pom.xml* file:
+The first step is to add the following block under the tag called *project* of your *pom.xml* file:
 
 [source,XML]
 ----
@@ -169,18 +169,18 @@ Finally, right-click on the class above and choose "Run":
 If everything is fine, your application logs should look like the following:
 
 
-image::Intellij-run-ok.png[Project Started successfully,720,align=left]
+image::quickstart-java27-cb65/Intellij-run-ok.png[Project Started successfully,720,align=left]
 
 
 TIP:: If you get any errors, double-check if the IP address, username, password and bucket name of your Couchbase instance is correct.
 
 
-== Step 4: Create and query new document
+== Step 4: Create and query a new document
 
 Suppose we need to store the following data in the database representing 3 distinct users:
 
 
-[source,JavaScript]
+[source,text]
 ----
 //user::0001
 {
@@ -281,7 +281,7 @@ Note that we have two special annotations in the class above:
 - *@Document:* (Optional) - Identifies a domain object to be persisted as a document in Couchbase.
 
 
-Now, let's create the repository responsible to manage our *User* entity. Create a new interface named *UserRepository* extending the *CouchbaseRepository* class:
+Now, let's create the repository responsible for managing our *User* entity. Create a new interface named *UserRepository* extending the *CouchbaseRepository* class:
 
 [source,Java]
 ----
@@ -300,10 +300,12 @@ public interface UserRepository extends CouchbaseRepository<User, String> {
 }
 ----
 
-Note that our class is decorated with the *@Repository* annotation, it is used to indicate that the class provides the mechanism for storage, retrieval, search, update and delete operation on objects.
+Note that we decorate our class with the *@Repository* annotation.
+This indicates that our class provides the mechanism for storage,
+retrieval, search, update, and delete operation on objects.
 
-
-We also added in the interface the method *findByEmailLike*. This method is named that way because it is using the link:https://docs.spring.io/spring-data/couchbase/docs/current/reference/html/#couchbase.repository.n1ql[Spring Data DSL]. Whenever you use this DSL, Spring automatically generates an implementation for you. Worth to highlight that methods like *save*, *saveAll*, *delete*, *deleteById*, *findById*, etc are also automatically generated when you extend the *CouchbaseRepository* class.
+We also added in the interface the method *findByEmailLike*. This method is named that way because it is using the link:https://docs.spring.io/spring-data/couchbase/docs/current/reference/html/#couchbase.repository.n1ql[Spring Data DSL]. Whenever you use this DSL, Spring automatically generates an implementation for you.
+It is worth highlighting that methods like *save*, *saveAll*, *delete*, *deleteById*, *findById*, etc. are also automatically generated when you extend the *CouchbaseRepository* class.
 
 Using a repository is rather simple: all you need to do is to inject it using the *@Autowired* annotation.:
 
@@ -323,7 +325,7 @@ import java.util.Optional;
 
 /**
  * Components of the type CommandLineRunner are called right after
- * the application start up. So the method *run* is called as soon as
+ * the application starts up. So the method *run* is called as soon as
  * the application starts.
  */
 @Component
@@ -370,25 +372,26 @@ public class CmdRunner implements CommandLineRunner {
 
 ----
 
-Create a new class called *CmdRunner* and paste the content above. Then, go back to your main class (*QuickStartCouchbase* in this example), and run it again. Don't forget to stop your application first if it was already running.
+Create a new class called *CmdRunner* and paste the content above. Then, go back to your main class (*QuickStartCouchbase* in this example) and run it again. Don't forget to stop your application first if it was already running.
 
 The output should look like the following:
 
-image::Intellij-application-run-succesfully.png[Application Ran Successfully,720,align=left]
+image::quickstart-java27-cb65/Intellij-application-run-succesfully.png[Application Ran Successfully,720,align=left]
 
 
-TIP: If you forgot to create the required indexes, your application will fail to execute the *CmdRunner* class. Check out this xref:quickstart-docker-image-manual-cb65.adoc[tutorial] or run `+create primary index on default+`on link:https://docs.couchbase.com/server/current/tools/query-workbench.html[Couchbase's Query Workbench]. I'm assuming that *default* is the name of your bucket.
+TIP: If you forget to create the required indexes, your application will fail to execute the *CmdRunner* class. Check out this xref:quickstart-docker-image-manual-cb65.adoc[tutorial] or run `+create primary index on default+`on link:https://docs.couchbase.com/server/current/tools/query-workbench.html[Couchbase's Query Workbench]. I'm assuming that *default* is the name of your bucket.
 
 
-In the code above, we first create a new instances of the *User* entity and store them in the database using the *save* method. This is how all three documents will look like on Couchbase:
+In the code above, we first create a new instance of the *User* entity and store them in the database using the *save* method. This is what all three documents will look like on Couchbase:
 
-image::inserted-documents.png[Document Inserted,720,align=left]
+image::quickstart-java27-cb65/inserted-documents.png[Document Inserted,720,align=left]
 
-In the *CmdRunner* class we also get the document back using its id `user::0001` through the method *findById*. Finally we query all user documents where `email like "%@acme.com"` using the method *findByEmailLike*.
+In the *CmdRunner* class we also get the document back using its id `user::0001` through the method *findById*.
+Finally, we query all user documents where `email like "%@acme.com"` using the method *findByEmailLike*.
 
 Note that the *id* of the document is not stored directly in the body of the JSON, but in a meta space called *metadata*:
 
-image::document-metadata.png[Document Metadata, 360,align=left]
+image::quickstart-java27-cb65/document-metadata.png[Document Metadata, 360,align=left]
 
 TIP: You might have noticed that there is a *_class* attribute in the JSON file. This attribute is automatically added by Spring Data to represent the link:https://docs.couchbase.com/server/6.5/learn/data/document-data-model.html#flexible-dynamic-schema[type] of the document.
 
